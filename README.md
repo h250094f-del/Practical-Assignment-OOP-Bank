@@ -4,7 +4,7 @@
 
 # Department: School of Information and Sciences
 
-# Assignment Title: Bank Account Management System Using Java
+# Assignment Title: Bank Account Management System And Lab Assignment Using Java
 
 
 
