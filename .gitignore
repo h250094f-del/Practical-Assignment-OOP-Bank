@@ -1,0 +1,17 @@
+*.class
+
+bin/
+out/
+target/
+
+five-lines.txt
+learners-*.txt
+File IO, Lambdas and Streams/five-lines.txt
+File IO, Lambdas and Streams/learners-*.txt
+
+.vscode/
+.idea/
+*.iml
+.project
+.classpath
+clipboard_guide.txt

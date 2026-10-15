@@ -1,39 +1,44 @@
-import java.util.InputMismatchException;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
-
 public class ExceptionHandlingExamples {
 
     public static void main(String[] args) {
-        try (Scanner scanner = new Scanner(System.in)) {
-            demonstrateDivision(scanner);
-        }
+        // Demonstrate built-in and custom exceptions.
+        demonstrateDivision();
         demonstrateArrayAccess();
         demonstrateAgeValidation();
         demonstrateBankWithdrawal();
         demonstrateFinallyExecution();
     }
 
-    private static void demonstrateDivision(Scanner scanner) {
+    private static void demonstrateDivision() {
         System.out.println("INTEGER DIVISION");
+
+        divideAndPrint("20", "4");
+
+        divideAndPrint("10", "0");
+
+        divideAndPrint("abc", "2");
+    }
+
+    private static void divideAndPrint(String numStr, String denStr) {
+        // Parsing and division can fail for different reasons.
         try {
-            System.out.print("Enter two integers: ");
-            int dividend = scanner.nextInt();
-            int divisor = scanner.nextInt();
-            System.out.println("Result: " + dividend / divisor);
-        } catch (InputMismatchException exception) {
-            System.out.println("Input error: both values must be integers.");
-            scanner.nextLine();
+            System.out.printf("Dividing %s / %s -> ", numStr, denStr);
+            int dividend = Integer.parseInt(numStr);
+            int divisor = Integer.parseInt(denStr);
+            int result = dividend / divisor;
+            System.out.println("Result = " + result);
+        } catch (NumberFormatException exception) {
+            System.out.println("Input error: both values must be valid integers.");
         } catch (ArithmeticException exception) {
             System.out.println("Division error: cannot divide by zero.");
-        } catch (NoSuchElementException exception) {
-            System.out.println("Input error: two integers are required.");
         }
     }
 
     private static void demonstrateArrayAccess() {
         System.out.println("\nARRAY ACCESS");
         int[] values = {10, 20, 30};
+
+        printElement(values, 1);
         printElement(values, 5);
     }
 
@@ -41,18 +46,23 @@ public class ExceptionHandlingExamples {
         try {
             System.out.println("Value at index " + index + ": " + values[index]);
         } catch (ArrayIndexOutOfBoundsException exception) {
-            System.out.println("Invalid array index: " + index);
+            System.out.println("Invalid array index: " + index + " (valid indices: 0 to " + (values.length - 1) + ")");
         }
     }
 
     private static void demonstrateAgeValidation() {
         System.out.println("\nAGE VALIDATION");
+        tryAge(25);
+        tryAge(-5);
+        tryAge(130);
+    }
+
+    private static void tryAge(int age) {
         try {
-            validateAge(25);
-            System.out.println("Age 25 is valid.");
-            validateAge(130);
+            validateAge(age);
+            System.out.println("Age " + age + " is valid.");
         } catch (InvalidAgeException exception) {
-            System.out.println("Invalid age: " + exception.getMessage());
+            System.out.println("Invalid age " + age + ": " + exception.getMessage());
         }
     }
 
@@ -65,13 +75,17 @@ public class ExceptionHandlingExamples {
     private static void demonstrateBankWithdrawal() {
         System.out.println("\nBANK WITHDRAWAL");
         CheckedBankAccount account = new CheckedBankAccount(100.0);
+        System.out.println("Initial Balance: $" + String.format("%.2f", account.getBalance()));
+
         try {
             account.withdraw(30.0);
-            System.out.println("Balance after withdrawal: " + account.getBalance());
+            System.out.println("Withdrew $30.00. Balance remaining: $" + String.format("%.2f", account.getBalance()));
+
             account.withdraw(100.0);
+            System.out.println("Withdrew $100.00. Balance remaining: $" + String.format("%.2f", account.getBalance()));
         } catch (InsufficientFundsException exception) {
             System.out.println("Withdrawal rejected: " + exception.getMessage());
-            System.out.println("Balance remains: " + account.getBalance());
+            System.out.println("Balance remains: $" + String.format("%.2f", account.getBalance()));
         }
     }
 
@@ -83,33 +97,34 @@ public class ExceptionHandlingExamples {
 
     private static int returnFromTry() {
         try {
-            System.out.println("Returning from try.");
+            System.out.println("Returning from try block.");
             return 42;
         } finally {
-            System.out.println("Finally runs before the method returns.");
+            // The finally block runs before the pending return completes.
+            System.out.println("Finally block executed before method returned.");
         }
     }
 
-    private static class InvalidAgeException extends Exception {
+    public static class InvalidAgeException extends Exception {
         private static final long serialVersionUID = 1L;
 
-        private InvalidAgeException(String message) {
+        public InvalidAgeException(String message) {
             super(message);
         }
     }
 
-    private static class InsufficientFundsException extends Exception {
+    public static class InsufficientFundsException extends Exception {
         private static final long serialVersionUID = 1L;
 
-        private InsufficientFundsException(String message) {
+        public InsufficientFundsException(String message) {
             super(message);
         }
     }
 
-    private static class CheckedBankAccount {
+    public static class CheckedBankAccount {
         private double balance;
 
-        private CheckedBankAccount(double openingBalance) {
+        public CheckedBankAccount(double openingBalance) {
             if (!Double.isFinite(openingBalance) || openingBalance < 0.0) {
                 throw new IllegalArgumentException(
                         "opening balance must be finite and non-negative");
@@ -117,18 +132,20 @@ public class ExceptionHandlingExamples {
             balance = openingBalance;
         }
 
-        private void withdraw(double amount) throws InsufficientFundsException {
+        public void withdraw(double amount) throws InsufficientFundsException {
             if (!Double.isFinite(amount) || amount <= 0.0) {
                 throw new IllegalArgumentException(
                         "withdrawal must be finite and positive");
             }
+            // Report insufficient funds with a checked exception.
             if (amount > balance) {
-                throw new InsufficientFundsException("not enough funds");
+                throw new InsufficientFundsException(
+                        String.format("insufficient funds (requested $%.2f, available $%.2f)", amount, balance));
             }
             balance -= amount;
         }
 
-        private double getBalance() {
+        public double getBalance() {
             return balance;
         }
     }

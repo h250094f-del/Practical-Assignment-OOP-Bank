@@ -10,6 +10,7 @@ import java.util.Set;
 public class NestedTypesExamples {
 
     public static void main(String[] args) {
+        // Run examples of enums, records, nested classes, and object contracts.
         demonstrateLevelEnum();
         demonstrateStudentRecord();
         demonstrateBookObjectContract();
@@ -18,111 +19,117 @@ public class NestedTypesExamples {
     }
 
     private static void demonstrateLevelEnum() {
-        System.out.println("LEVEL ADVICE");
+        System.out.println("LEVEL ENUM (SWITCH DISPATCH)");
         for (Level level : Level.values()) {
-            switch (level) {
-                case LOW:
-                    System.out.println(level + ": Take your time.");
-                    break;
-                case MEDIUM:
-                    System.out.println(level + ": Stay attentive.");
-                    break;
-                case HIGH:
-                    System.out.println(level + ": Act immediately.");
-                    break;
-            }
+            String advice = switch (level) {
+                case LOW -> "Take your time.";
+                case MEDIUM -> "Stay attentive.";
+                case HIGH -> "Act immediately.";
+            };
+            System.out.println("  " + level + ": " + advice);
         }
     }
 
     private static void demonstrateStudentRecord() {
-        System.out.println("\nSTUDENT RECORD");
+        System.out.println("\nSTUDENT RECORD (COMPACT IMMUTABLE DATA CARRIER)");
         Student first = new Student("Amina", 20);
         Student equal = new Student("Amina", 20);
 
-        System.out.println(first);
-        System.out.println("Records equal: " + first.equals(equal));
-        System.out.println("Name component: " + first.name());
+        System.out.println("  Record instance: " + first);
+        System.out.println("  Records equal?   " + first.equals(equal));
+        System.out.println("  Name component:  " + first.name());
+        System.out.println("  Age component:   " + first.age());
     }
 
     private static void demonstrateBookObjectContract() {
-        System.out.println("\nBOOK ISBN EQUALITY");
+        System.out.println("\nBOOK OBJECT CONTRACT (EQUALS & HASHCODE BY ISBN)");
         Set<Book> books = new HashSet<>();
-        books.add(new Book("978-0134685991", "Effective Java"));
-        boolean addedDuplicate = books.add(
-                new Book("978-0134685991", "A Different Title"));
+        Book book1 = new Book("978-0134685991", "Effective Java");
+        Book book2 = new Book("978-0134685991", "Effective Java (3rd Edition)");
 
-        System.out.println("Added duplicate ISBN: " + addedDuplicate);
-        System.out.println("Books in set: " + books.size());
+        books.add(book1);
+        boolean addedDuplicate = books.add(book2);
+
+        System.out.println("  Added first book:  " + book1);
+        System.out.println("  Added duplicate ISBN? " + addedDuplicate);
+        System.out.println("  Total unique books in Set: " + books.size());
     }
 
     private static void demonstrateCustomLinkedList() {
-        System.out.println("\nCUSTOM LINKED LIST");
+        System.out.println("\nCUSTOM LINKED LIST (STATIC NESTED NODE & INNER ITERATOR)");
         LinkedList<String> names = new LinkedList<>();
         names.add("Amina");
         names.add("Brian");
         names.add("Chloe");
 
+        System.out.println("  Iterating through custom linked list:");
         for (String name : names) {
-            System.out.println(name);
+            System.out.println("    - " + name);
         }
     }
 
     private static void demonstrateCoinChange() {
-        System.out.println("\nCOIN CHANGE");
+        System.out.println("\nCOIN ENUM (GREEDY CHANGE ALGORITHM)");
         int amount = 87;
         Map<Coin, Integer> change = Coin.fewestCoins(amount);
-        System.out.println("Amount: " + amount + " cents");
+        System.out.println("  Change for " + amount + " cents:");
         for (Map.Entry<Coin, Integer> entry : change.entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
+            System.out.printf("    %-8s (%2d cents) : %d coin(s)%n",
+                    entry.getKey(), entry.getKey().getCents(), entry.getValue());
         }
     }
 
-    private enum Level {
+    public enum Level {
         LOW,
         MEDIUM,
         HIGH
     }
 
-    private record Student(String name, int age) {
-    }
+    public record Student(String name, int age) {}
 
-    private static final class Book {
+    public static final class Book {
         private final String isbn;
         private final String title;
 
-        private Book(String isbn, String title) {
+        public Book(String isbn, String title) {
             this.isbn = Objects.requireNonNull(isbn, "isbn must not be null");
             this.title = Objects.requireNonNull(title, "title must not be null");
         }
 
+        public String getIsbn() {
+            return isbn;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
         @Override
         public boolean equals(Object other) {
-            if (this == other) {
-                return true;
-            }
-            if (!(other instanceof Book)) {
-                return false;
-            }
-            Book book = (Book) other;
+            // Books are equal when their ISBN values match.
+            if (this == other) return true;
+            if (!(other instanceof Book book)) return false;
             return isbn.equals(book.isbn);
         }
 
         @Override
         public int hashCode() {
+            // Use the same ISBN field as equals.
             return isbn.hashCode();
         }
 
         @Override
         public String toString() {
-            return title + " [" + isbn + "]";
+            return title + " [ISBN: " + isbn + "]";
         }
     }
 
-    private static final class LinkedList<E> implements Iterable<E> {
+    public static final class LinkedList<E> implements Iterable<E> {
         private Node<E> head;
         private Node<E> tail;
 
-        private void add(E value) {
+        public void add(E value) {
+            // Append each new node after the current tail.
             Node<E> node = new Node<>(value);
             if (tail == null) {
                 head = node;
@@ -137,16 +144,16 @@ public class NestedTypesExamples {
             return new ListIterator();
         }
 
-        private static final class Node<T> {
-            private final T value;
-            private Node<T> next;
+        public static final class Node<T> {
+            final T value;
+            Node<T> next;
 
-            private Node(T value) {
+            Node(T value) {
                 this.value = value;
             }
         }
 
-        private final class ListIterator implements Iterator<E> {
+        public final class ListIterator implements Iterator<E> {
             private Node<E> next = head;
 
             @Override
@@ -166,7 +173,7 @@ public class NestedTypesExamples {
         }
     }
 
-    private enum Coin {
+    public enum Coin {
         PENNY(1),
         NICKEL(5),
         DIME(10),
@@ -178,14 +185,19 @@ public class NestedTypesExamples {
             this.cents = cents;
         }
 
-        private static Map<Coin, Integer> fewestCoins(int amount) {
+        public int getCents() {
+            return cents;
+        }
+
+        public static Map<Coin, Integer> fewestCoins(int amount) {
             if (amount < 0) {
-                throw new IllegalArgumentException("amount must be non-negative");
+                throw new IllegalArgumentException("Amount must be non-negative");
             }
 
             Map<Coin, Integer> result = new LinkedHashMap<>();
             int remaining = amount;
             Coin[] coins = values();
+            // Greedily use larger denominations before smaller ones.
             for (int i = coins.length - 1; i >= 0; i--) {
                 Coin coin = coins[i];
                 int count = remaining / coin.cents;

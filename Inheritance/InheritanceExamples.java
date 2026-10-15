@@ -5,123 +5,139 @@ import java.util.List;
 public class InheritanceExamples {
 
     public static void main(String[] args) {
+        // Compare inheritance, constructor chaining, and composition.
         demonstratePersonStudentAndTeacher();
         demonstrateVehicleConstructorOrder();
         demonstrateStackComposition();
     }
 
     private static void demonstratePersonStudentAndTeacher() {
-        System.out.println("PERSON, STUDENT, AND TEACHER");
+        System.out.println("PERSON, STUDENT, AND TEACHER (INHERITANCE & SUPER)");
         Student student = new Student("Amina", 20, "Computer Science");
         Teacher teacher = new Teacher("Mr. Kato", 42, "Programming");
 
+        System.out.print("  ");
         student.display();
-        System.out.println("Course: " + student.getCourse());
+        System.out.println("    Course: " + student.getCourse());
+
+        System.out.print("  ");
         teacher.display();
-        System.out.println("Subject: " + teacher.getSubject());
+        System.out.println("    Subject: " + teacher.getSubject());
     }
 
     private static void demonstrateVehicleConstructorOrder() {
-        System.out.println("\nVEHICLE CONSTRUCTOR ORDER");
+        System.out.println("\nVEHICLE CONSTRUCTOR HIERARCHY (SUPER CONSTRUCTOR CHAINING)");
+        System.out.println("Instantiating ElectricCar(\"Nissan\", 40):");
         new ElectricCar("Nissan", 40);
     }
 
     private static void demonstrateStackComposition() {
-        System.out.println("\nSTACK USING COMPOSITION");
+        System.out.println("\nSTACK USING COMPOSITION OVER INHERITANCE");
         SimpleStack<String> stack = new SimpleStack<>();
         stack.push("first");
         stack.push("second");
-        System.out.println("Top item: " + stack.peek());
-        System.out.println("Removed: " + stack.pop());
-        System.out.println("Items remaining: " + stack.size());
+        System.out.println("  Top item (peek): " + stack.peek());
+        System.out.println("  Popped item:     " + stack.pop());
+        System.out.println("  Items remaining: " + stack.size());
     }
 
-    private static class Person {
+    public static class Person {
         private final String name;
         private final int age;
 
-        private Person(String name, int age) {
+        public Person(String name, int age) {
             this.name = name;
             this.age = age;
         }
 
-        protected void display() {
+        public void display() {
             System.out.println("Name: " + name + ", age: " + age);
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getAge() {
+            return age;
         }
     }
 
-    private static class Student extends Person {
+    public static class Student extends Person {
         private final String course;
 
-        private Student(String name, int age, String course) {
+        public Student(String name, int age, String course) {
+            // Initialize inherited name and age in the superclass.
             super(name, age);
             this.course = course;
         }
 
-        private String getCourse() {
+        public String getCourse() {
             return course;
         }
     }
 
-    private static class Teacher extends Person {
+    public static class Teacher extends Person {
         private final String subject;
 
-        private Teacher(String name, int age, String subject) {
+        public Teacher(String name, int age, String subject) {
             super(name, age);
             this.subject = subject;
         }
 
-        private String getSubject() {
+        public String getSubject() {
             return subject;
         }
     }
 
-    private static class Vehicle {
-        private Vehicle(String type) {
-            System.out.println("Vehicle constructor: " + type);
+    public static class Vehicle {
+        public Vehicle(String type) {
+            System.out.println("  [1] Vehicle constructor invoked: " + type);
         }
     }
 
-    private static class Car extends Vehicle {
-        private Car(String brand) {
+    public static class Car extends Vehicle {
+        public Car(String brand) {
             super("Car");
-            System.out.println("Car constructor: " + brand);
+            System.out.println("  [2] Car constructor invoked: " + brand);
         }
     }
 
-    private static class ElectricCar extends Car {
-        private ElectricCar(String brand, int batteryKwh) {
+    public static class ElectricCar extends Car {
+        public ElectricCar(String brand, int batteryKwh) {
+            // Constructor calls move from the most specific class to its parents.
             super(brand);
-            System.out.println("ElectricCar constructor: " + batteryKwh + " kWh battery");
+            System.out.println("  [3] ElectricCar constructor invoked: " + batteryKwh + " kWh battery");
         }
     }
 
-    private static class SimpleStack<E> {
+    public static class SimpleStack<E> {
+        // This stack uses a list internally instead of extending a collection.
         private final List<E> items = new ArrayList<>();
 
-        private void push(E item) {
+        public void push(E item) {
             items.add(item);
         }
 
-        private E pop() {
+        public E pop() {
             if (items.isEmpty()) {
                 throw new EmptyStackException();
             }
             return items.remove(items.size() - 1);
         }
 
-        private E peek() {
+        public E peek() {
             if (items.isEmpty()) {
                 throw new EmptyStackException();
             }
             return items.get(items.size() - 1);
         }
 
-        private boolean isEmpty() {
+        public boolean isEmpty() {
             return items.isEmpty();
         }
 
-        private int size() {
+        public int size() {
             return items.size();
         }
     }

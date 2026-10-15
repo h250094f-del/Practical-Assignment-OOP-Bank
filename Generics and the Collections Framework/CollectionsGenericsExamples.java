@@ -1,10 +1,10 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -12,17 +12,19 @@ import java.util.stream.Collectors;
 public class CollectionsGenericsExamples {
 
     public static void main(String[] args) {
+        // Run examples using collections, generic types, and algorithms.
         demonstrateArrayList();
         demonstrateSet();
         demonstrateGenericStack();
-        demonstrateWordFrequencies();
+        demonstrateWordFrequencies(args);
         demonstrateBubbleSort();
     }
 
     private static void demonstrateArrayList() {
         System.out.println("ARRAYLIST NUMBERS");
         List<Integer> numbers = new ArrayList<>(Arrays.asList(
-                12, 5, 8, 21, 3, 17, 9, 14, 6, 10));
+                12, 5, 8, 21, 3, 17, 9, 14, 6, 10
+        ));
 
         int sum = 0;
         int maximum = numbers.get(0);
@@ -34,18 +36,20 @@ public class CollectionsGenericsExamples {
         }
 
         List<Integer> reversed = new ArrayList<>(numbers);
-        java.util.Collections.reverse(reversed);
+        Collections.reverse(reversed);
 
         System.out.println("Numbers: " + numbers);
         System.out.println("Sum: " + sum);
         System.out.println("Maximum: " + maximum);
-        System.out.println("Reverse: " + reversed);
+        System.out.println("Reversed: " + reversed);
     }
 
     private static void demonstrateSet() {
         System.out.println("\nUNIQUE NAMES");
         List<String> names = Arrays.asList(
-                "Amina", "Brian", "Amina", "Chloe", "Brian", "Darius");
+                "Amina", "Brian", "Amina", "Chloe", "Brian", "Darius"
+        );
+        // LinkedHashSet removes duplicates while preserving first-seen order.
         Set<String> uniqueNames = new LinkedHashSet<>(names);
         System.out.println("Original: " + names);
         System.out.println("Without duplicates: " + uniqueNames);
@@ -54,56 +58,60 @@ public class CollectionsGenericsExamples {
     private static void demonstrateGenericStack() {
         System.out.println("\nGENERIC STACK");
         Stack<String> stack = new Stack<>();
-        stack.push("first");
-        stack.push("second");
-        System.out.println("Top: " + stack.peek());
-        System.out.println("Removed: " + stack.pop());
-        System.out.println("Is empty: " + stack.isEmpty());
+        stack.push("Alpha");
+        stack.push("Beta");
+        stack.push("Gamma");
+
+        System.out.println("Top element (peek): " + stack.peek());
+        System.out.println("Popped element: " + stack.pop());
+        System.out.println("Current top: " + stack.peek());
+        System.out.println("Stack empty? " + stack.isEmpty());
+        System.out.println("Stack size: " + stack.size());
     }
 
-    private static void demonstrateWordFrequencies() {
+    private static void demonstrateWordFrequencies(String[] args) {
         System.out.println("\nWORD FREQUENCIES");
-        System.out.print("Enter a paragraph: ");
-        try (Scanner scanner = new Scanner(System.in)) {
-            String paragraph = scanner.hasNextLine() ? scanner.nextLine() : "";
-            Map<String, Integer> frequencies = new TreeMap<>();
+        String paragraph = args.length > 0 && !args[0].isBlank()
+                ? args[0]
+                : "Java is an object-oriented programming language. Java is robust, secure, and versatile. Programming in Java is fun.";
 
-            for (String word : paragraph.toLowerCase().split("[^\\p{L}\\p{N}]+")) {
-                if (!word.isEmpty()) {
-                    frequencies.merge(word, 1, Integer::sum);
-                }
+        System.out.println("Analyzing paragraph: \"" + paragraph + "\"");
+        Map<String, Integer> frequencies = new TreeMap<>();
+
+        for (String word : paragraph.toLowerCase().split("[^\\p{L}\\p{N}]+")) {
+            if (!word.isEmpty()) {
+                frequencies.merge(word, 1, Integer::sum);
             }
+        }
 
-            List<Map.Entry<String, Integer>> sortedFrequencies =
-                    frequencies.entrySet().stream()
-                            .sorted(Map.Entry.<String, Integer>comparingByValue(
-                                    Comparator.reverseOrder())
-                                    .thenComparing(Map.Entry.comparingByKey()))
-                            .collect(Collectors.toList());
+        List<Map.Entry<String, Integer>> sortedFrequencies =
+                frequencies.entrySet().stream()
+                        .sorted(Map.Entry.<String, Integer>comparingByValue(Comparator.reverseOrder())
+                                .thenComparing(Map.Entry.comparingByKey()))
+                        .collect(Collectors.toList());
 
-            if (sortedFrequencies.isEmpty()) {
-                System.out.println("No words found.");
-            } else {
-                for (Map.Entry<String, Integer> entry : sortedFrequencies) {
-                    System.out.println(entry.getKey() + ": " + entry.getValue());
-                }
-            }
+        System.out.println("Word Counts (sorted by frequency descending, then alphabetically):");
+        for (Map.Entry<String, Integer> entry : sortedFrequencies) {
+            System.out.printf("  - %-12s : %d%n", entry.getKey(), entry.getValue());
         }
     }
 
     private static void demonstrateBubbleSort() {
         System.out.println("\nGENERIC BUBBLE SORT");
-        Integer[] numbers = {5, 1, 4, 2, 8};
+        Integer[] numbers = {5, 1, 9, 4, 2, 8};
         String[] words = {"pear", "apple", "orange", "banana"};
 
+        System.out.println("Before sorting integers: " + Arrays.toString(numbers));
         bubbleSort(numbers);
-        bubbleSort(words);
+        System.out.println("After sorting integers:  " + Arrays.toString(numbers));
 
-        System.out.println("Integers: " + Arrays.toString(numbers));
-        System.out.println("Strings: " + Arrays.toString(words));
+        System.out.println("Before sorting strings:  " + Arrays.toString(words));
+        bubbleSort(words);
+        System.out.println("After sorting strings:   " + Arrays.toString(words));
     }
 
-    private static <T extends Comparable<T>> void bubbleSort(T[] arr) {
+    public static <T extends Comparable<T>> void bubbleSort(T[] arr) {
+        // Stop early when a pass makes no swaps.
         for (int end = arr.length - 1; end > 0; end--) {
             boolean swapped = false;
             for (int i = 0; i < end; i++) {
@@ -120,29 +128,34 @@ public class CollectionsGenericsExamples {
         }
     }
 
-    private static class Stack<T> {
+    public static class Stack<T> {
+        // The final list element is the top of this last-in, first-out stack.
         private final List<T> items = new ArrayList<>();
 
-        private void push(T item) {
+        public void push(T item) {
             items.add(item);
         }
 
-        private T pop() {
+        public T pop() {
             if (isEmpty()) {
-                throw new IllegalStateException("cannot pop from an empty stack");
+                throw new IllegalStateException("Cannot pop from an empty stack");
             }
             return items.remove(items.size() - 1);
         }
 
-        private T peek() {
+        public T peek() {
             if (isEmpty()) {
-                throw new IllegalStateException("cannot peek at an empty stack");
+                throw new IllegalStateException("Cannot peek at an empty stack");
             }
             return items.get(items.size() - 1);
         }
 
-        private boolean isEmpty() {
+        public boolean isEmpty() {
             return items.isEmpty();
+        }
+
+        public int size() {
+            return items.size();
         }
     }
 }

@@ -3,9 +3,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+
 public class AbstractionExamples {
 
     public static void main(String[] args) {
+        // Each method demonstrates a different abstraction feature.
         demonstrateShapes();
         demonstrateFlyable();
         demonstrateAccounts();
@@ -14,7 +16,8 @@ public class AbstractionExamples {
     }
 
     private static void demonstrateShapes() {
-        System.out.println("SHAPES");
+        System.out.println("SHAPES (ABSTRACT CLASS & POLYMORPHISM)");
+        // A Shape reference can hold any concrete shape implementation.
         Shape[] shapes = {
             new Circle(3.0),
             new Rectangle(4.0, 5.0),
@@ -22,22 +25,22 @@ public class AbstractionExamples {
         };
 
         for (Shape shape : shapes) {
-            System.out.printf(
-                    "%s: area=%.2f, perimeter=%.2f%n",
+            System.out.printf("  %s: area=%.2f, perimeter=%.2f%n",
                     shape.getClass().getSimpleName(), shape.area(), shape.perimeter());
         }
     }
 
     private static void demonstrateFlyable() {
-        System.out.println("\nFLYABLE");
+        System.out.println("\nFLYABLE (INTERFACE IMPLEMENTATION)");
         Flyable[] flyers = {new Bird(), new Aeroplane()};
         for (Flyable flyer : flyers) {
+            System.out.print("  ");
             flyer.fly();
         }
     }
 
     private static void demonstrateAccounts() {
-        System.out.println("\nACCOUNTS");
+        System.out.println("\nACCOUNTS (ABSTRACT SUPERCLASS)");
         Account[] accounts = {
             new SavingsAccount(1000.0),
             new CurrentAccount(1000.0)
@@ -45,8 +48,7 @@ public class AbstractionExamples {
 
         for (Account account : accounts) {
             account.deposit(100.0);
-            System.out.printf(
-                    "%s balance=%.2f, monthly fee=%.2f%n",
+            System.out.printf("  %s balance=%.2f, monthly fee=%.2f%n",
                     account.getClass().getSimpleName(),
                     account.getBalance(),
                     account.monthlyFee());
@@ -54,34 +56,36 @@ public class AbstractionExamples {
     }
 
     private static void demonstrateStudentSorting() {
-        System.out.println("\nSTUDENT SORTING");
+        System.out.println("\nSTUDENT SORTING (COMPARABLE & COMPARATOR)");
         List<Student> students = new ArrayList<>(Arrays.asList(
                 new Student("Zara", 91),
                 new Student("Amina", 85),
-                new Student("Brian", 85)));
+                new Student("Brian", 85)
+        ));
 
+        // Natural ordering sorts by name; the comparator then sorts by marks.
         students.sort(null);
-        System.out.println("By name: " + students);
+        System.out.println("  By name (natural order): " + students);
 
         students.sort(Comparator.comparingInt(Student::getMarks));
-        System.out.println("By marks (ascending): " + students);
+        System.out.println("  By marks (ascending):    " + students);
     }
 
     private static void demonstrateDefaultMethodConflict() {
-        System.out.println("\nDEFAULT METHOD CONFLICT");
+        System.out.println("\nDEFAULT METHOD CONFLICT RESOLUTION");
         new HelloBoth().hello();
     }
 
-    private abstract static class Shape {
+    public abstract static class Shape {
+        // Concrete shapes provide their own formulas for these operations.
         public abstract double area();
-
         public abstract double perimeter();
     }
 
-    private static class Circle extends Shape {
+    public static class Circle extends Shape {
         private final double radius;
 
-        private Circle(double radius) {
+        public Circle(double radius) {
             this.radius = radius;
         }
 
@@ -96,11 +100,11 @@ public class AbstractionExamples {
         }
     }
 
-    private static class Rectangle extends Shape {
+    public static class Rectangle extends Shape {
         private final double width;
         private final double height;
 
-        private Rectangle(double width, double height) {
+        public Rectangle(double width, double height) {
             this.width = width;
             this.height = height;
         }
@@ -116,10 +120,10 @@ public class AbstractionExamples {
         }
     }
 
-    private static class Square extends Shape {
+    public static class Square extends Shape {
         private final double side;
 
-        private Square(double side) {
+        public Square(double side) {
             this.side = side;
         }
 
@@ -134,39 +138,39 @@ public class AbstractionExamples {
         }
     }
 
-    private interface Flyable {
+    public interface Flyable {
+        // Implementations define how each object flies.
         void fly();
     }
 
-    private static class Bird implements Flyable {
+    public static class Bird implements Flyable {
         @Override
         public void fly() {
             System.out.println("Bird flies by flapping its wings.");
         }
     }
 
-    private static class Aeroplane implements Flyable {
+    public static class Aeroplane implements Flyable {
         @Override
         public void fly() {
             System.out.println("Aeroplane flies using lift from its wings.");
         }
     }
 
-    private abstract static class Account {
+    public abstract static class Account {
         private double balance;
 
-        private Account(double openingBalance) {
+        public Account(double openingBalance) {
             if (!Double.isFinite(openingBalance) || openingBalance < 0.0) {
-                throw new IllegalArgumentException(
-                        "opening balance must be finite and non-negative");
+                throw new IllegalArgumentException("Opening balance must be finite and non-negative.");
             }
             balance = openingBalance;
         }
 
+        // Shared deposit logic is final; subclasses supply their monthly fee.
         public final void deposit(double amount) {
             if (!Double.isFinite(amount) || amount <= 0.0) {
-                throw new IllegalArgumentException(
-                        "deposit must be finite and positive");
+                throw new IllegalArgumentException("Deposit must be finite and positive.");
             }
             balance += amount;
         }
@@ -178,8 +182,8 @@ public class AbstractionExamples {
         public abstract double monthlyFee();
     }
 
-    private static class SavingsAccount extends Account {
-        private SavingsAccount(double openingBalance) {
+    public static class SavingsAccount extends Account {
+        public SavingsAccount(double openingBalance) {
             super(openingBalance);
         }
 
@@ -189,10 +193,10 @@ public class AbstractionExamples {
         }
     }
 
-    private static class CurrentAccount extends Account {
+    public static class CurrentAccount extends Account {
         private static final double MONTHLY_FEE = 20.0;
 
-        private CurrentAccount(double openingBalance) {
+        public CurrentAccount(double openingBalance) {
             super(openingBalance);
         }
 
@@ -202,20 +206,20 @@ public class AbstractionExamples {
         }
     }
 
-    private static class Student implements Comparable<Student> {
+    public static class Student implements Comparable<Student> {
         private final String name;
         private final int marks;
 
-        private Student(String name, int marks) {
+        public Student(String name, int marks) {
             this.name = name;
             this.marks = marks;
         }
 
-        private String getName() {
+        public String getName() {
             return name;
         }
 
-        private int getMarks() {
+        public int getMarks() {
             return marks;
         }
 
@@ -230,24 +234,24 @@ public class AbstractionExamples {
         }
     }
 
-    private interface FirstHello {
+    public interface FirstHello {
         default void hello() {
-            System.out.println("Hello from FirstHello.");
+            System.out.println("  Hello from FirstHello.");
         }
     }
 
-    private interface SecondHello {
+    public interface SecondHello {
         default void hello() {
-            System.out.println("Hello from SecondHello.");
+            System.out.println("  Hello from SecondHello.");
         }
     }
 
-    private static class HelloBoth implements FirstHello, SecondHello {
+    public static class HelloBoth implements FirstHello, SecondHello {
         @Override
         public void hello() {
             FirstHello.super.hello();
             SecondHello.super.hello();
-            System.out.println("Conflict resolved in HelloBoth.");
+            System.out.println("  Conflict resolved explicitly in HelloBoth.");
         }
     }
 }
